@@ -2,12 +2,31 @@ import 'package:flutter/material.dart';
 import 'api.dart';
 
 class TemperatureControl {
-  TemperatureControl();
+  double _userTargetTemp;
 
-  void _decreaseTemp() {}
+  TemperatureControl() {
+    _userTargetTemp = -1.0;
+    updateUserTargetTemp();
+  }
+
+  Future<void> updateUserTargetTemp() async {
+    List list = await Api.getRoomInfo();
+    _userTargetTemp = list[2];
+  }
+
+  void _setTargetTemp() {
+    if (_userTargetTemp == -1.0) return;
+    Api.postTargetTemp(_userTargetTemp);
+  }
+
+  void _decreaseTemp() {
+    if (_userTargetTemp == null) return;
+    _userTargetTemp -= 0.5;
+  }
 
   void _increaseTemp() {
-    print('minus');
+    if (_userTargetTemp == null) return;
+    _userTargetTemp += 0.5;
   }
 
   Widget body() {
@@ -17,18 +36,11 @@ class TemperatureControl {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            new IconButton(
-              iconSize: 20.0,
-              icon: new Icon(Icons.remove_circle),
-              tooltip: 'Minus 0,5 grade',
-              onPressed: () => _decreaseTemp(),
-            ),
-            new IconButton(
-              iconSize: 20.0,
-              icon: new Icon(Icons.add_circle),
-              tooltip: 'Plus 0,5 grade',
-              onPressed: () => _increaseTemp(),
-            ),
+            _buildIconButton(
+                Icons.remove_circle_outline, 'Minus 0,5 grade', _decreaseTemp),
+            _buildTextField(_userTargetTemp),
+            _buildIconButton(
+                Icons.add_circle_outline, 'Plus 0,5 grade', _increaseTemp),
           ],
         ),
         _buildSetButton(),
@@ -36,18 +48,31 @@ class TemperatureControl {
     );
   }
 
+  Widget _buildTextField(double targetTemp) {
+    return new Text(targetTemp.toString(), style: TextStyle(fontSize: 24.0));
+  }
+
+  Widget _buildIconButton(IconData icon, String text, Function function) {
+    return new IconButton(
+      iconSize: 100.0,
+      icon: new Icon(icon),
+      tooltip: text,
+      onPressed: () => function(),
+    );
+  }
+
   Widget _buildSetButton() {
-    return ButtonBar(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        FlatButton(
-          splashColor: Colors.blue,
-          child: const Text('Apasa pentru : ', style: TextStyle(fontSize: 20.0)),
-          onPressed: () {
-            // Perform some action
-          },
+    return new RaisedButton(
+      padding: const EdgeInsets.all(8.0),
+      textColor: Colors.white,
+      color: Colors.blue,
+      onPressed: () => _setTargetTemp(),
+      child: new Text(
+        "Seteaza temperatura",
+        style: TextStyle(
+          fontSize: 20.0,
         ),
-      ],
+      ),
     );
   }
 }

@@ -28,13 +28,18 @@ class Api {
     return [_humidity, _currentTemp, _targetTemp];
   }
 
-  static Future<bool> postTargetTemp(double temp) async {
+  static Future<void> postTargetTemp(double temp) async {
     List list;
     double _currentTemp, _humidity;
-    
     list = await getRoomInfo();
     _humidity = list[0];
     _currentTemp = list[1];
+    final String postRequest =
+        'http://api.thingspeak.com/update?api_key=6OURMUW6NIIMYABB&field1=$_humidity&field2=$_currentTemp&field3=$temp';
 
+    final response = await http.get(postRequest);
+    if (response.statusCode == 200) {
+    } else
+      throw Exception('Failed to post targetTemp!');
   }
 }

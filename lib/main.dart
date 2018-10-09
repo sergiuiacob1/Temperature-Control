@@ -50,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return new Text(
       text,
       style: new TextStyle(
-        fontSize: 20.0,
+        fontSize: 30.0,
       ),
     );
   }
@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
     List temps;
     try {
       temps = await Api.getRoomInfo();
-      _humidity = temps[1];
+      _humidity = temps[0];
       _currentTemp = temps[1];
       _targetTemp = temps[2];
 
@@ -89,6 +89,10 @@ class _MyHomePageState extends State<MyHomePage> {
             _createTextWidget(_humidityString),
             _createTextWidget(_currentTempString),
             _createTextWidget(_targetTempString),
+            Divider(
+              height: 100.0,
+              color: Colors.transparent,
+            ),
             temperatureControl.body(),
           ],
         ),
